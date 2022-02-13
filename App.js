@@ -280,7 +280,7 @@ const testLocation = (props) => {
     }
     )};
 
-const OGSection = ({children, title}): Node => {
+const OGSection = ({children, title}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
