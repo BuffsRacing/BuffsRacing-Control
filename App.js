@@ -51,6 +51,13 @@ import KeepAwake from '@sayem314/react-native-keep-awake';
 
 import Section from "./components/layoutStuff.js";
 
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({ 
+  dsn: 'https://bbc078d511424858b0ebe58eb135b68c@o126149.ingest.sentry.io/6202127', 
+});
+
+
 
 const cameraPattern = "ralphiecam-00";
 
@@ -574,7 +581,9 @@ const App: () => Node = () => {
             <Text>{"\n"}</Text>
             <Button title="Test Bluetooth" onPress={() => {bluetoothStuff()}}></Button>
             <Text>{"\n"}</Text>
-            <Button title="Experiment" onPress={() => experimentalStuff()}></Button>          
+            <Button title="Experiment" onPress={() => experimentalStuff()}></Button> 
+            <Text>{"\n"}</Text>
+            <Button title="Force Crash App" onPress={() => {throw new Error("My first Sentry error!")}}></Button>      
           </Section>
 
           <Section title="Configuration">
@@ -597,4 +606,4 @@ const App: () => Node = () => {
 };
 
 
-export default App;
+export default Sentry.wrap(App);
