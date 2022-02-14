@@ -581,9 +581,7 @@ const App: () => Node = () => {
             <Text>{"\n"}</Text>
             <Button title="Test Bluetooth" onPress={() => {bluetoothStuff()}}></Button>
             <Text>{"\n"}</Text>
-            <Button title="Experiment" onPress={() => experimentalStuff()}></Button> 
-            <Text>{"\n"}</Text>
-            <Button title="Force Crash App" onPress={() => {throw new Error("My first Sentry error!")}}></Button>      
+            <Button title="Experiment" onPress={() => experimentalStuff()}></Button>       
           </Section>
 
           <Section title="Configuration">
