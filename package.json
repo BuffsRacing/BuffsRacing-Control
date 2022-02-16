@@ -16,12 +16,11 @@
     "ffmpeg-kit-react-native": "^4.5.1",
     "react": "17.0.2",
     "react-native": "0.67.1",
-    "react-native-bluetooth-classic": "^1.60.0-rc.20",
     "react-native-default-preference": "^1.4.3",
     "react-native-geolocation-service": "^5.3.0-beta.4",
     "react-native-modal": "^13.0.0",
     "react-native-paper": "^4.11.2",
-    "react-native-sensors": "^7.3.3",
+    "react-native-permissions": "^3.2.0",
     "react-native-toast-message": "^2.1.1"
   },
   "devDependencies": {
