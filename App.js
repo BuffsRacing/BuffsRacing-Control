@@ -280,7 +280,12 @@ const testStreamTwitch = (rtmpURL, props) => {
 };
 
 const experiment = (rtmpURL, props) => {
-  FFmpegKit.execute(`-f android_camera -video_size 640x480 -i discarded -r 30 -c:v libx264 -f flv "${rtmpURL}"`).then(async (session) => {
+  if (Platform.OS === 'ios') {
+    ffmpeg_command = `-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f flv "${rtmpURL}"`
+  } else {
+    ffmpeg_command = `-f android_camera -video_size 640x480 -i discarded -r 30 -c:v libx264 -f flv "${rtmpURL}"`
+  }
+  FFmpegKit.execute(ffmpeg_command).then(async (session) => {
     const returnCode = await session.getReturnCode();
   
     if (ReturnCode.isSuccess(returnCode)) {
@@ -349,7 +354,12 @@ const bluetoothStuff = () => {
 }
 
 const experimentalStuff = () => {
-  FFmpegKit.execute('-f android_camera -list_formats all').then(async (session) => {
+  if (Platform.OS === 'ios') {
+    command = `-f avfoundation -list_devices true -i \"\"`
+  } else {
+    command = `-f android_camera -list_devices true -i ""`
+  }
+  FFmpegKit.execute(command).then(async (session) => {
     const returnCode = await session.getReturnCode();
   
     if (ReturnCode.isSuccess(returnCode)) {
