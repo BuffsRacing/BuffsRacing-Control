@@ -13,19 +13,20 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   Button,
   useColorScheme,
   View,
   Platform,
-  Switch, 
 } from 'react-native';
 
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
+import {request, requestMultiple, PERMISSIONS, RESULTS} from 'react-native-permissions'
+
+//import { TextInput } from 'react-native';
 import { TextInput } from 'react-native-paper'; // TextInput component provided by react-native does not render, and I cannot waste more time on this weirdass bug.
 
 import Header from "./components/header";
@@ -38,10 +39,6 @@ import Geolocation from 'react-native-geolocation-service';
 import Toast from 'react-native-toast-message';
 import { Buffer } from "buffer"
 import { FFmpegKit,ReturnCode } from 'ffmpeg-kit-react-native';
-
-import RNBluetoothClassic, {
-  BluetoothDevice
-} from 'react-native-bluetooth-classic';
 
 
 import DefaultPreference from 'react-native-default-preference';
@@ -89,28 +86,47 @@ const toastMessage = (title,message,type="success") => {
 }
 
 const requestCameraPermission = async () => {
-  try {
-    const granted = await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.CAMERA,PermissionsAndroid.PERMISSIONS.RECORD_AUDIO],
-      {
-        title: "BuffsControl Camera And Microphone Permission",
-        message:
-          "Buffs Control App needs access to your camera " +
-          "so you can stream your camera.",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
+  if (Platform.OS === 'ios') {
+    requestMultiple([PERMISSIONS.IOS.CAMERA,PERMISSIONS.IOS.MICROPHONE]).then((statuses) => {
+      console.log('Camera', statuses[PERMISSIONS.IOS.CAMERA]);
+      console.log('Microphone', statuses[PERMISSIONS.IOS.MICROPHONE]);
+      if (statuses[PERMISSIONS.IOS.CAMERA] === RESULTS.GRANTED) {
+        console.log("Camera permission granted");
+        toastMessage("Camera Permission","Already Granted")
+      } else {
+        toastMessage("Camera Permission",`${statuses[PERMISSIONS.IOS.CAMERA]}`,"error")
       }
-    );
-    if (granted["android.permission.CAMERA"] === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("You can use the camera");
-      toastMessage("Camera Permission","Already Granted")
-    } else {
-      console.log("Camera permission denied");
-      toastMessage("Camera Permission","Denied","error")
+      if (statuses[PERMISSIONS.IOS.MICROPHONE] === RESULTS.GRANTED) {
+        console.log("Microphone permission granted");
+        toastMessage("Microphone Permission","Already Granted")
+      } else {
+        toastMessage("Microphone Permission",`${statuses[PERMISSIONS.IOS.MICROPHONE]}`,"error")
+      }
+    })
+  } else {
+    try {
+      const granted = await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.CAMERA,PermissionsAndroid.PERMISSIONS.RECORD_AUDIO],
+        {
+          title: "BuffsControl Camera And Microphone Permission",
+          message:
+            "Buffs Control App needs access to your camera " +
+            "so you can stream your camera.",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK"
+        }
+      );
+      if (granted["android.permission.CAMERA"] === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("You can use the camera");
+        toastMessage("Camera Permission","Already Granted")
+      } else {
+        console.log("Camera permission denied");
+        toastMessage("Camera Permission","Denied","error")
+      }
+    } catch (err) {
+      console.warn(err);
     }
-  } catch (err) {
-    console.warn(err);
-  }
+}
 };
 
 const requestBluetoothPermission = async () => {
@@ -138,6 +154,18 @@ const requestBluetoothPermission = async () => {
 
 
 const requestLocationPermission = async () => {
+  if (Platform.OS === 'ios') {
+    request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE).then((result) => {
+      console.log(result);
+      if (result === RESULTS.GRANTED ) {
+        console.log("Location Permission Granted");
+        toastMessage("Location Permission","Already Granted")
+      } else {
+        console.log("Location Permission Denied");
+        toastMessage("Location Permission",`${result}`,"error")
+      }
+    })
+  } else {
   try {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
@@ -161,6 +189,7 @@ const requestLocationPermission = async () => {
   } catch (err) {
     console.warn(err)
   }
+}
 };
 
 const getLocation = (setDeviceLatitude,setDeviceLongitude) => {
@@ -204,9 +233,6 @@ const testSendLocation = (deviceLatitude,deviceLongitude,grafanaKey,grafanaHost,
   const token = `${username}:${grafanaKey}`;
   const base64 = Buffer.from(token).toString('base64');
 
-  const headers = {
-    "Authorization": `Basic ${base64}`
-  }
   console.log(`https://${grafanaHost}`)
   fetch(`https://${grafanaHost}`, {
     method: 'POST',
@@ -319,14 +345,6 @@ const OGSection = ({children, title}) => {
 
 const bluetoothStuff = () => {
   console.log("test");
-  try {
-    connected = RNBluetoothClassic.getConnectedDevices().then(console.log({connected}))
-
-} catch (err) {
-  console.log(err)
-    // Error if Bluetooth is not enabled
-    // Or there are any issues requesting paired devices
-}
   
 }
 
@@ -452,18 +470,14 @@ const App: () => Node = () => {
 
   var [deviceLatitude, setDeviceLatitude] = React.useState(0.0);
   var [deviceLongitude, setDeviceLongitude] = React.useState(0.0);
-  var [isStreaming, setStreaming] = React.useState(false);
   var [isTelemetry, setTelemetry] = React.useState(false);
-  var [isCountedTo, setCountedTo] = React.useState(0);
   var [loopID, setLoopID] = React.useState(0);
-  const [text, setText] = React.useState('');
   var [showingModal, setShowingModal] = React.useState(false);
 
   var [grafanaKey, setGrafanaKey] = React.useState('your_grafana_key_here');
   var [rtmpURL, setRTMPURL] = React.useState('rtmp://your_rtmp_url_here');
   var [grafanaUser, setGrafanaUser] = React.useState('your_grafana_user_here');
   var [grafanaHost, setGrafanaHost] = React.useState('your_grafana_host_here');
-  var [grafanaDataFor, setGrafanaDataFor] = React.useState('your_grafana_data_for_here');
 
   DefaultPreference.get('grafana_key').then(value => {
     if (value === null) {
@@ -506,8 +520,6 @@ const App: () => Node = () => {
   };
 
   //const loopFunction = setInterval(logStuff(isCountedTo, setCountedTo), 1000);
-  var loopFunction = null;
-  const [number, onChangeNumber] = React.useState(null);
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -522,47 +534,60 @@ const App: () => Node = () => {
           }]}>
 
 <Modal isVisible={showingModal} backdropColor={isDarkMode ? Colors.black : Colors.white}>
+<ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={backgroundStyle}>
         <View style={{ flex: 1, }}>
         <Section title="Configuration" >
+        <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
           <Text>Grafana API Key:</Text>
           <TextInput
         onChangeText={value => {setGrafanaKey(value); DefaultPreference.set('grafana_key', value)}}
         value={grafanaKey}
-        placeholder="useless placeholder"
+        placeholder="Grafana API Key" 
+        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
       />
+      </View>
       <Text>{"\n"}</Text>
+      <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
       <Text>Grafana Username:</Text>
           <TextInput
         onChangeText={value => {setGrafanaUser(value); DefaultPreference.set('grafana_user', value)}}
         value={grafanaUser}
         placeholder="useless placeholder"
       />
+      </View>
       <Text>{"\n"}</Text>
+      <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
       <Text>Grafana Host:</Text>
           <TextInput
         onChangeText={value => {setGrafanaHost(value); DefaultPreference.set('grafana_host', value)}}
         value={grafanaHost}
         placeholder="useless placeholder"
       />
+      </View>
       <Text>{"\n"}</Text>
+      <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
       <Text>RTMP URL:</Text>
           <TextInput
         onChangeText={value => {setRTMPURL(value); DefaultPreference.set('rtmp_url', value)}}
         value={rtmpURL}
         placeholder="useless placeholder"
       />
+      </View>
       <Text>{"\n"}</Text>
           <Button onPress={() => {setShowingModal(false)}}  title="Close" />
           </Section>
         </View>
+        </ScrollView>
       </Modal>
           
           <Section title="Permissions">
           <Button title="Location Permissions" onPress={requestLocationPermission} />
           <Text>{"\n"}</Text>
           <Button title="Camera Permissions" onPress={requestCameraPermission} />
-          <Text>{"\n"}</Text>
-          <Button title="Bluetooth Permissions" onPress={requestBluetoothPermission} />
+          
+          {Platform.OS === 'android' && <Text>{"\n"}</Text> && <Button title="Bluetooth Permissions" onPress={requestBluetoothPermission} />}
           </Section>
            
           <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
@@ -592,7 +617,7 @@ const App: () => Node = () => {
             <Text>{"\n"}</Text>
             <Button title={isTelemetry ? 'Stop Telemetry ' : 'Start Telemetry '} onPress={() => {setTelemetry(isTelemetry => !isTelemetry);StartTelemetry(isTelemetry,loopID, setLoopID,grafanaKey,grafanaHost,grafanaUser)}}></Button>
             <Text>{"\n"}</Text>
-    
+            <TextInput style={{ backgroundColor: '#ededed', height: 60 }} value={'Hello'}/>
             </Section>
 
           <Section title="Useless Padding" />
