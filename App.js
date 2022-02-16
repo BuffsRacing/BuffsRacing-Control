@@ -616,8 +616,6 @@ const App: () => Node = () => {
           <Section title="Run">
             <Text>{"\n"}</Text>
             <Button title={isTelemetry ? 'Stop Telemetry ' : 'Start Telemetry '} onPress={() => {setTelemetry(isTelemetry => !isTelemetry);StartTelemetry(isTelemetry,loopID, setLoopID,grafanaKey,grafanaHost,grafanaUser)}}></Button>
-            <Text>{"\n"}</Text>
-            <TextInput style={{ backgroundColor: '#ededed', height: 60 }} value={'Hello'}/>
             </Section>
 
           <Section title="Useless Padding" />
