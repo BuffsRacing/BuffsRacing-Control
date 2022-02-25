@@ -3,7 +3,7 @@
 # BuffsControl
 
 ![BuffsControl App Logo](./cropped.png)
- 
+
 </div> 
 <hr>
 
@@ -24,17 +24,17 @@ Current features include:
 <details>
 <summary>Click to open</summary>
 <br>
- 
+
 ### iOS 
- 
+
 ![iOS Screenshot 02](./docs/assets/ios-ss-02.png)
 ![iOS Screenshot 01](./docs/assets/ios-ss-01.png)
- 
+
 ### Android
- 
+
 ![Android Screenshot 02](./docs/assets/and-ss-02.png)
 ![Android Screenshot 01](./docs/assets/and-ss-01.png)
- 
+
 </details>
 
 ## Building
@@ -65,9 +65,16 @@ npx react-native run-ios --device
 npx react-native set-icon --path ./cropped.png --background white --platform <android/ios>
 ```
 
-### macOS Specific Shenanigans
+### macOS -> Android Specific Shenanigans
 
-Install 
+Install the correct version of android-sdk (Tested with Homebrew version) and Java (Tested with OpenJDK version 8)
+
+```
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home"
+export ANDROID_SDK_ROOT="/usr/local/share/android-sdk/"
+```
+
+
 
 
 
