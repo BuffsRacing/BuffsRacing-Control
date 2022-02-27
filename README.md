@@ -5,6 +5,7 @@
 ![BuffsControl App Logo](./cropped.png)
 
 </div> 
+
 <hr>
 
 ## About
@@ -18,6 +19,16 @@ Current features include:
   * Data from OBD-2 using OBD2REST
 * Live Streaming
   * Any RTMP URL (Tested with Twitch)
+
+## Installing (without Building)
+
+### iOS
+
+Request Testflight link
+
+### Android
+
+Request APK
 
 ## Screenshots
 
