@@ -41,9 +41,16 @@ import KeepAwake from '@sayem314/react-native-keep-awake';
 import Section from "./components/layoutStuff.js";
 
 import * as Sentry from '@sentry/react-native';
+import { CaptureConsole } from "@sentry/integrations";
+
 
 Sentry.init({ 
   dsn: 'https://bbc078d511424858b0ebe58eb135b68c@o126149.ingest.sentry.io/6202127', 
+  integrations: [
+    new CaptureConsole({
+      levels: ["log", "warn", "error"],
+    }),
+  ],
 });
 
 
@@ -225,8 +232,8 @@ const testSendLocation = (deviceLatitude,deviceLongitude,grafanaKey,grafanaHost,
   const token = `${username}:${grafanaKey}`;
   const base64 = Buffer.from(token).toString('base64');
 
-  console.log(`https://${grafanaHost}`)
-  fetch(`https://${grafanaHost}`, {
+  console.log(`Trying to log to ${grafanaHost}`)
+  fetch(`${grafanaHost}`, {
     method: 'POST',
     headers: {
       'Accept': 'application/json, text/plain, */*',
@@ -417,7 +424,7 @@ var getAndSendLocation = (grafana_username,grafana_key,grafana_host) => {
         const token = `${username}:${grafana_key}`
         const base64 = Buffer.from(token).toString('base64')
       
-        fetch(`https://${grafana_host}`, {
+        fetch(`${grafana_host}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

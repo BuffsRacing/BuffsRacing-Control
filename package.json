@@ -1,6 +1,6 @@
 {
   "name": "BuffsControl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@bam.tech/react-native-make": "^3.0.3",
     "@sayem314/react-native-keep-awake": "^1.0.4",
+    "@sentry/integrations": "^6.18.1",
     "@sentry/react-native": "^3.2.13",
     "buffer": "^6.0.3",
     "ffmpeg-kit-react-native": "^4.5.1",
