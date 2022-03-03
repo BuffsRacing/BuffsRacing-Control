@@ -177,12 +177,12 @@ const requestLocationPermission = async () => {
           console.log(position);
         },
         (error) => {
-          console.log(error.code,error.message);
+          console.error(error.code,error.message);
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
       );
     } else {
-      console.log("Location permission denied");
+      console.error("Location permission denied");
       toastMessage("Location Permission","Denied","error")
     }
   } catch (err) {
@@ -201,7 +201,7 @@ const getLocation = (setDeviceLatitude,setDeviceLongitude) => {
       }
     ),
     (error) => {
-      console.log(error.code,error.message);
+      console.error(error.code,error.message);
     }
   }
   catch (err) {
@@ -251,7 +251,7 @@ const testSendLocation = (deviceLatitude,deviceLongitude,grafanaKey,grafanaHost,
     
     )
   .catch(function(error) {
-    console.log('There has been a problem with your fetch operation: ' + error.message);
+    console.error('There has been a problem with your fetch operation: ' + error.message);
      // ADD THIS THROW error
       throw error;
     });
@@ -312,7 +312,7 @@ const testLocation = (props) => {
       toastMessage("Your Latitude and Longitude",`${positionCoords.latitude}, ${positionCoords.longitude}`, "info")
     },
     (error) => {
-      console.log(error.code,error.message);
+      console.error(error.code,error.message);
       toastMessage("Location Error",error.message, "error")
     }
     )};
